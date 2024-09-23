@@ -1,0 +1,48 @@
+#!/bin/sh
+REAL_COMPOSER=/usr/bin/composer
+
+# 本来のcomposerに対するラッパースクリプト
+# 授業配布のディレクトリはすでに内容が入っているため、必要であれば他のディレクトリで初期状態をつくってマージしないといけない
+# そのためのスクリプトとなっている
+
+# 第1引数が"create-project"以外であればそのまま動かす
+if [ ! "z$1" = "zcreate-project" ]; then
+    exec ${REAL_COMPOSER} "$@"
+fi
+
+# 最後の引数をディレクトリとみなして、一度変数DESTに取り出しておく
+DEST="${@: -1}"
+
+# 対象ディレクトリが空っぽであれば、本来のcomposerにそのまま仕事を任せる
+if [ ! -d ${DEST} ]; then
+    exec ${REAL_COMPOSER} "$@"
+fi
+
+WORKDIR=$(mktemp -d -u)
+
+# DESTを絶対パスにして置き直す
+DEST=$(cd ${DEST} && pwd)
+
+# 引数の数を取得
+num_args=$#
+
+# 最後の引数を取り除いた引数リストを作成
+new_args=""
+count=1
+
+for arg in "$@"; do
+    if [ $count -lt $num_args ]; then
+        new_args="$new_args $arg"
+    fi
+    count=$((count + 1))
+done
+
+set -e
+/usr/bin/composer $new_args ${WORKDIR}
+set +e
+
+cd $WORKDIR
+rm -fr vendor
+cp -rf . ${DEST}
+cd ${DEST}
+${REAL_COMPOSER} install

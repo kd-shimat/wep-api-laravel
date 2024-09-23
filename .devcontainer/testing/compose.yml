@@ -1,0 +1,20 @@
+services:
+  web:
+    ports:
+      # 開発・テスト時は80番ポートを使う、ホスト側へのマッピングは127.0.0.1のランダムポートとする
+      - 127.0.0.1::80
+
+  app:
+    # 既存の設定を継承
+
+  db:
+    # 既存の設定を継承
+
+
+# ボリューム db_data を定義、ファイルシステムはtmpfsを使う
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs

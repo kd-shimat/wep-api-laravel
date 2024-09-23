@@ -1,0 +1,14 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+mysql-connector-python = "*"
+sqlalchemy = "*"
+
+[dev-packages]
+selenium = "*"
+
+[requires]
+python_version = "3"

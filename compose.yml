@@ -1,0 +1,39 @@
+services:
+  web:
+    #image: nginx:alpine
+    build: docker/web
+    volumes:
+      - .:/app:cached
+    env_file:
+      - env.txt
+    depends_on:
+      - app
+      - db
+
+  app:
+    #image: php:fpm-alpine
+    build: docker/app
+    env_file:
+      - env.txt
+    volumes:
+      - .:/app:cached
+
+  db:
+    image: ghcr.io/densuke/mysql:main
+    #build: db/build
+    env_file:
+      - env.txt
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+
+volumes:
+  db_data:
+
